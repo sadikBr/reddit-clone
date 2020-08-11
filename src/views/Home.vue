@@ -1,18 +1,190 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <form @submit.prevent="setSearchTerm" class="form">
+      <input v-model="input" type="text" name="search-input" />
+      <button type="submit">Search</button>
+    </form>
+
+    <div class="results">
+      <img
+        class="loading-image"
+        v-if="loading"
+        src="https://flevix.com/wp-content/uploads/2019/07/Curve-Loading.gif"
+        alt="loading spiner"
+      />
+      <h3 v-if="error">The term you searched does not exist</h3>
+      <div :key="item.data.title+item.data.created" v-for="item in output" class="card">
+        <img :src="item.data.url" :alt="item.data.title" />
+        <h1>{{ item.data.title }}</h1>
+      </div>
+    </div>
+
+    <button @click="scrollUp" v-if="fadeIn" class="scroll-up">⬆</button>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
-
 export default {
-  name: 'Home',
-  components: {
-    HelloWorld
+  name: "Home",
+  data() {
+    return {
+      input: "",
+      searchTerm: "",
+      output: [],
+      loading: false,
+      error: false,
+      fadeIn: false,
+
+      setSearchTerm() {
+        this.searchTerm = this.input.trim().split(" ").join("");
+        this.input = "";
+      },
+    };
+  },
+  methods: {
+    scrollUp() {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "smooth",
+      });
+    },
+    showButton() {
+      window.addEventListener("scroll", () => {
+        this.fadeIn = window.scrollY > 1500;
+      });
+    },
+  },
+  mounted() {
+    this.showButton();
+  },
+  watch: {
+    searchTerm() {
+      this.output = [];
+      this.loading = true;
+      this.error = false;
+      fetch(`https://www.reddit.com/r/${this.searchTerm}/.json?limit=100`)
+        .then((response) => response.json())
+        .catch(() => {
+          this.error = true;
+          this.loading = false;
+        })
+        .then((data) => {
+          this.output = data.data.children.filter((item) =>
+            item.data.url.match(/(.jpe?g|.png|.gif)$/)
+          );
+          this.loading = false;
+        })
+        .catch(() => {
+          this.error = true;
+          this.loading = false;
+        });
+    },
+  },
+};
+</script>
+
+<style lang="scss" scoped>
+.home {
+  width: 100%;
+  position: relative;
+}
+
+.form {
+  width: 60%;
+  margin: 0 auto 40px auto;
+  height: 35px;
+  display: flex;
+  justify-content: space-between;
+
+  input {
+    flex: 7;
+    padding: 8px;
+    font-size: 18px;
+    border: none;
+    outline: none;
+    box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+  }
+
+  button {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: #42b983;
+    color: white;
+    cursor: pointer;
   }
 }
-</script>
+
+.results {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  font-size: 8px;
+
+  h3 {
+    font-size: 2rem;
+    color: pink;
+    margin-top: 100px;
+  }
+
+  .card {
+    width: 32%;
+    margin: 5px;
+    background: white;
+    height: fit-content;
+    box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: auto;
+    }
+
+    h1 {
+      padding: 12px 24px;
+    }
+  }
+}
+
+.loading-image {
+  width: 400px;
+  height: auto;
+}
+
+.scroll-up {
+  padding: 5px 10px 8px 10px;
+  border-radius: 3px;
+  position: fixed;
+  right: 30px;
+  bottom: 30px;
+  font-size: 2rem;
+  color: white;
+  background: #42b983;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  opacity: 1;
+  animation: animate 1s ease-in-out infinite alternate, fadein 1s ease-in-out;
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes animate {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(20px);
+  }
+}
+</style>

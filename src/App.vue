@@ -1,27 +1,59 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+    <div class="nav">
+      <h1 class="logo">Reddit</h1>
+      <div class="links">
+        <router-link to="/">Home</router-link>
+        <router-link to="/image">About</router-link>
+      </div>
     </div>
-    <router-view/>
+    <router-view />
   </div>
 </template>
 
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-#nav {
-  padding: 30px;
+body {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  width: 100vw;
+  height: 100vh;
+  color: #2c3e50;
+  overflow-x: hidden;
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+  width: 80%;
+  margin: auto;
+}
+
+.nav {
+  display: flex;
+  padding: 20px 0px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  color: #42b983;
+  flex: 5;
+}
+
+.links {
+  display: flex;
+  justify-content: space-between;
+  flex: 1;
 
   a {
     font-weight: bold;
+    text-transform: uppercase;
+    text-decoration: none;
     color: #2c3e50;
 
     &.router-link-exact-active {
