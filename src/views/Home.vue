@@ -14,7 +14,9 @@
       />
       <h3 v-if="error">The term you searched does not exist</h3>
       <div :key="item.data.title + item.data.created" v-for="item in output" class="card">
-        <img :src="item.data.url" :alt="item.data.title" />
+        <router-link :to="{name: 'Item', params: { name: item.data.title, url: item.data.url } }">
+          <img :src="item.data.url" :alt="item.data.title" />
+        </router-link>
         <h1>{{ item.data.title }}</h1>
       </div>
     </div>

@@ -4,7 +4,7 @@
       <h1 class="logo">Reddit</h1>
       <div class="links">
         <router-link to="/">Home</router-link>
-        <router-link to="/image">About</router-link>
+        <router-link to="/about">About</router-link>
       </div>
     </div>
     <router-view />
