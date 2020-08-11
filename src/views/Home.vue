@@ -203,4 +203,16 @@ export default {
     }
   }
 }
+
+@media screen and (max-width: 450px) {
+  .form {
+    input {
+      width: 70%;
+    }
+
+    button {
+      width: 30%;
+    }
+  }
+}
 </style>
