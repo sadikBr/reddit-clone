@@ -9,7 +9,7 @@
       <img
         class="loading-image"
         v-if="loading"
-        src="https://flevix.com/wp-content/uploads/2019/07/Curve-Loading.gif"
+        src="https://i.pinimg.com/originals/f9/41/ae/f941ae9d16fd7d2957eea6e5b1100d1e.gif"
         alt="loading spiner"
       />
       <h3 v-if="error">The term you searched does not exist</h3>
@@ -158,7 +158,7 @@ export default {
   padding: 5px 10px 8px 10px;
   border-radius: 3px;
   position: fixed;
-  right: 30px;
+  right: 5px;
   bottom: 30px;
   font-size: 2rem;
   color: white;
