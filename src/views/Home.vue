@@ -206,6 +206,8 @@ export default {
 
 @media screen and (max-width: 450px) {
   .form {
+    width: 80%;
+
     input {
       width: 70%;
     }
@@ -213,6 +215,10 @@ export default {
     button {
       width: 30%;
     }
+  }
+
+  .scroll-up {
+    padding: 2px 4px 4px 4px;
   }
 }
 </style>
