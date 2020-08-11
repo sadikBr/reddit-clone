@@ -61,4 +61,28 @@ body {
     }
   }
 }
+
+@media screen and (max-width: 950px) {
+  .logo {
+    flex: 4;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .logo {
+    flex: 3;
+  }
+}
+
+@media screen and (max-width: 550px) {
+  .logo {
+    flex: 2;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .logo {
+    flex: 1.5;
+  }
+}
 </style>

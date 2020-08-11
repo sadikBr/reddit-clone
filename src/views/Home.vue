@@ -13,7 +13,7 @@
         alt="loading spiner"
       />
       <h3 v-if="error">The term you searched does not exist</h3>
-      <div :key="item.data.title+item.data.created" v-for="item in output" class="card">
+      <div :key="item.data.title + item.data.created" v-for="item in output" class="card">
         <img :src="item.data.url" :alt="item.data.title" />
         <h1>{{ item.data.title }}</h1>
       </div>
@@ -98,7 +98,7 @@ export default {
   justify-content: space-between;
 
   input {
-    flex: 7;
+    width: 80%;
     padding: 8px;
     font-size: 18px;
     border: none;
@@ -107,7 +107,7 @@ export default {
   }
 
   button {
-    flex: 1;
+    width: 20%;
     border: none;
     outline: none;
     background: #42b983;
@@ -185,6 +185,22 @@ export default {
   }
   to {
     transform: translateY(20px);
+  }
+}
+
+@media screen and (max-width: 950px) {
+  .results {
+    .card {
+      width: 47%;
+    }
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .results {
+    .card {
+      width: 90%;
+    }
   }
 }
 </style>
