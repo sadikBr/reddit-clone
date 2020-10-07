@@ -12,7 +12,7 @@
         src="https://i.pinimg.com/originals/f9/41/ae/f941ae9d16fd7d2957eea6e5b1100d1e.gif"
         alt="loading spiner"
       />
-      <h3 v-if="error">The term you searched does not exist</h3>
+      <h3 v-if="error">{{ searchTerm }} NOT FOUND</h3>
       <div
         :key="item.data.title + item.data.created"
         v-for="item in output"
