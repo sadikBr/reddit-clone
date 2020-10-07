@@ -70,19 +70,25 @@ export default {
       const resultData = [];
 
       while (after !== null) {
-        const response = await fetch(
-          `https://www.reddit.com/r/${searchTerm}/.json?limit=100&after=${after}`
-        );
+        try {
+          const response = await fetch(
+            `https://www.reddit.com/r/${searchTerm}/.json?limit=100&after=${after}`
+          );
 
-        const data = await response.json();
+          const data = await response.json();
 
-        after = data.data.after;
+          after = data.data.after;
 
-        resultData.push(
-          ...data.data.children.filter((item) =>
-            item.data.url.match(/(.jpe?g|.png|.gif)$/)
-          )
-        );
+          resultData.push(
+            ...data.data.children.filter((item) =>
+              item.data.url.match(/(.jpe?g|.png|.gif)$/)
+            )
+          );
+        } catch (error) {
+          this.loading = false;
+          this.error = true;
+          break;
+        }
       }
       this.loading = false;
       this.output = resultData;
