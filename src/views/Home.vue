@@ -41,10 +41,12 @@ export default {
     return {
       input: "",
       searchTerm: "",
+      after: undefined,
       output: [],
       loading: false,
       error: false,
       fadeIn: false,
+      callingAPI: false,
 
       setSearchTerm() {
         this.searchTerm = this.input.trim().split(" ").join("");
@@ -63,35 +65,42 @@ export default {
     showButton() {
       window.addEventListener("scroll", () => {
         this.fadeIn = window.scrollY > 1500;
+        if (
+          window.scrollY % 2000 > 1950 &&
+          this.after !== null &&
+          !this.callingAPI
+        ) {
+          this.getData(this.searchTerm, this.after);
+        }
       });
     },
-    async getData(searchTerm) {
-      let after;
+    async getData(searchTerm, after) {
       const resultData = [];
+      this.callingAPI = true;
 
-      while (after !== null) {
-        try {
-          const response = await fetch(
-            `https://www.reddit.com/r/${searchTerm}/.json?limit=100&after=${after}`
-          );
+      try {
+        const response = await fetch(
+          `https://www.reddit.com/r/${searchTerm}/.json?limit=25&after=${after}`
+        );
 
-          const data = await response.json();
+        const data = await response.json();
 
-          after = data.data.after;
+        this.after = data.data.after;
 
-          resultData.push(
-            ...data.data.children.filter((item) =>
-              item.data.url.match(/(.jpe?g|.png|.gif)$/)
-            )
-          );
-        } catch (error) {
-          this.loading = false;
-          this.error = true;
-          break;
-        }
+        resultData.push(
+          ...data.data.children.filter((item) =>
+            item.data.url.match(/(.jpe?g|.png|.gif)$/)
+          )
+        );
+      } catch (error) {
+        this.loading = false;
+        this.error = true;
+        this.callingAPI = false;
       }
+
       this.loading = false;
-      this.output = resultData;
+      this.callingAPI = false;
+      this.output.push(...resultData);
     },
   },
   mounted() {
@@ -102,7 +111,7 @@ export default {
       this.output = [];
       this.loading = true;
       this.error = false;
-      this.getData(this.searchTerm);
+      this.getData(this.searchTerm, this.after);
       // fetch(`https://www.reddit.com/r/${this.searchTerm}/.json?limit=100`)
       //   .then((response) => response.json())
       //   .catch(() => {
