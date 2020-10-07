@@ -13,8 +13,17 @@
         alt="loading spiner"
       />
       <h3 v-if="error">The term you searched does not exist</h3>
-      <div :key="item.data.title + item.data.created" v-for="item in output" class="card">
-        <router-link :to="{name: 'Item', params: { name: item.data.title, url: item.data.url } }">
+      <div
+        :key="item.data.title + item.data.created"
+        v-for="item in output"
+        class="card"
+      >
+        <router-link
+          :to="{
+            name: 'Item',
+            params: { name: item.data.title, url: item.data.url },
+          }"
+        >
           <img :src="item.data.url" :alt="item.data.title" />
         </router-link>
         <h1>{{ item.data.title }}</h1>
@@ -56,6 +65,28 @@ export default {
         this.fadeIn = window.scrollY > 1500;
       });
     },
+    async getData(searchTerm) {
+      let after;
+      const resultData = [];
+
+      while (after !== null) {
+        const response = await fetch(
+          `https://www.reddit.com/r/${searchTerm}/.json?limit=100&after=${after}`
+        );
+
+        const data = await response.json();
+
+        after = data.data.after;
+
+        resultData.push(
+          ...data.data.children.filter((item) =>
+            item.data.url.match(/(.jpe?g|.png|.gif)$/)
+          )
+        );
+      }
+      this.loading = false;
+      this.output = resultData;
+    },
   },
   mounted() {
     this.showButton();
@@ -65,22 +96,23 @@ export default {
       this.output = [];
       this.loading = true;
       this.error = false;
-      fetch(`https://www.reddit.com/r/${this.searchTerm}/.json?limit=100`)
-        .then((response) => response.json())
-        .catch(() => {
-          this.error = true;
-          this.loading = false;
-        })
-        .then((data) => {
-          this.output = data.data.children.filter((item) =>
-            item.data.url.match(/(.jpe?g|.png|.gif)$/)
-          );
-          this.loading = false;
-        })
-        .catch(() => {
-          this.error = true;
-          this.loading = false;
-        });
+      this.getData(this.searchTerm);
+      // fetch(`https://www.reddit.com/r/${this.searchTerm}/.json?limit=100`)
+      //   .then((response) => response.json())
+      //   .catch(() => {
+      //     this.error = true;
+      //     this.loading = false;
+      //   })
+      //   .then((data) => {
+      //     this.output = data.data.children.filter((item) =>
+      //       item.data.url.match(/(.jpe?g|.png|.gif)$/)
+      //     );
+      //     this.loading = false;
+      //   })
+      //   .catch(() => {
+      //     this.error = true;
+      //     this.loading = false;
+      //   });
     },
   },
 };
