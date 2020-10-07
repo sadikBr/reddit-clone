@@ -66,7 +66,9 @@ export default {
       window.addEventListener("scroll", () => {
         this.fadeIn = window.scrollY > 1500;
         if (
-          window.scrollY % 2000 > 1950 &&
+          this.searchTerm &&
+          document.querySelector(".results").clientHeight - window.scrollY <
+            1000 &&
           this.after !== null &&
           !this.callingAPI
         ) {
@@ -80,7 +82,7 @@ export default {
 
       try {
         const response = await fetch(
-          `https://www.reddit.com/r/${searchTerm}/.json?limit=25&after=${after}`
+          `https://www.reddit.com/r/${searchTerm}/.json?limit=30&after=${after}`
         );
 
         const data = await response.json();
@@ -109,6 +111,7 @@ export default {
   watch: {
     searchTerm() {
       this.output = [];
+      this.after = undefined;
       this.loading = true;
       this.error = false;
       this.getData(this.searchTerm, this.after);
@@ -170,6 +173,7 @@ export default {
   flex-wrap: wrap;
   justify-content: center;
   width: 100%;
+  // min-height: 1000px;
   font-size: 8px;
 
   h3 {
@@ -180,7 +184,7 @@ export default {
 
   .card {
     width: 32%;
-    margin: 5px;
+    margin: 10px 5px;
     background: white;
     height: fit-content;
     box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.3);
@@ -193,6 +197,8 @@ export default {
     }
 
     h1 {
+      color: gray;
+      font-size: 1.2rem;
       padding: 12px 24px;
     }
   }
@@ -200,7 +206,7 @@ export default {
 
 .loading-image {
   width: 400px;
-  height: auto;
+  height: 300px;
 }
 
 .scroll-up {
