@@ -26,7 +26,21 @@
         >
           <img :src="item.data.url" :alt="item.data.title" />
         </router-link>
-        <h1>{{ item.data.title }}</h1>
+        <h1 class="title">
+          {{ item.data.title }}
+          <span class="score">{{ item.data.score }}</span>
+        </h1>
+        <div class="footer">
+          <p class="date-author">
+            created {{ timeago.format(item.data.created_utc * 1000) }} by
+            <a
+              class="author"
+              :href="'https://www.reddit.com/u/' + item.data.author"
+              >u/{{ item.data.author }}.
+            </a>
+          </p>
+          <div class="heart"></div>
+        </div>
       </div>
     </div>
 
@@ -35,22 +49,28 @@
 </template>
 
 <script>
+import * as timeago from 'timeago.js';
+
 export default {
-  name: "Home",
+  name: 'Home',
   data() {
     return {
-      input: "",
-      searchTerm: "",
+      input: '',
+      searchTerm: '',
       after: undefined,
       output: [],
       loading: false,
       error: false,
       fadeIn: false,
       callingAPI: false,
+      timeago,
 
       setSearchTerm() {
-        this.searchTerm = this.input.trim().split(" ").join("");
-        this.input = "";
+        this.searchTerm = this.input
+          .trim()
+          .split(' ')
+          .join('');
+        this.input = '';
       },
     };
   },
@@ -59,15 +79,15 @@ export default {
       window.scrollTo({
         top: 0,
         left: 0,
-        behavior: "smooth",
+        behavior: 'smooth',
       });
     },
-    showButton() {
-      window.addEventListener("scroll", () => {
+    listenForScrolling() {
+      window.addEventListener('scroll', () => {
         this.fadeIn = window.scrollY > 1500;
         if (
           this.searchTerm &&
-          document.querySelector(".results").clientHeight - window.scrollY <
+          document.querySelector('.results').clientHeight - window.scrollY <
             1000 &&
           this.after !== null &&
           !this.callingAPI
@@ -82,7 +102,7 @@ export default {
 
       try {
         const response = await fetch(
-          `https://www.reddit.com/r/${searchTerm}/.json?limit=30&after=${after}`
+          `https://www.reddit.com/r/${searchTerm}/.json?limit=50&after=${after}`
         );
 
         const data = await response.json();
@@ -106,7 +126,7 @@ export default {
     },
   },
   mounted() {
-    this.showButton();
+    this.listenForScrolling();
   },
   watch: {
     searchTerm() {
@@ -115,22 +135,6 @@ export default {
       this.loading = true;
       this.error = false;
       this.getData(this.searchTerm, this.after);
-      // fetch(`https://www.reddit.com/r/${this.searchTerm}/.json?limit=100`)
-      //   .then((response) => response.json())
-      //   .catch(() => {
-      //     this.error = true;
-      //     this.loading = false;
-      //   })
-      //   .then((data) => {
-      //     this.output = data.data.children.filter((item) =>
-      //       item.data.url.match(/(.jpe?g|.png|.gif)$/)
-      //     );
-      //     this.loading = false;
-      //   })
-      //   .catch(() => {
-      //     this.error = true;
-      //     this.loading = false;
-      //   });
     },
   },
 };
@@ -140,6 +144,19 @@ export default {
 .home {
   width: 100%;
   position: relative;
+}
+
+.title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .score {
+    background: #42b983;
+    color: white;
+    border-radius: 5px;
+    padding: 3px 6px;
+  }
 }
 
 .form {
@@ -194,12 +211,57 @@ export default {
     img {
       width: 100%;
       height: auto;
+      display: inline-block;
+      box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
     }
 
-    h1 {
+    .title {
       color: gray;
       font-size: 1.2rem;
       padding: 12px 24px;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .date-author {
+        padding: 8px 24px;
+        font-size: 0.75rem;
+
+        .author {
+          color: #42b983;
+          text-decoration: none;
+          font-weight: bold;
+        }
+      }
+
+      .heart {
+        margin-right: 38px;
+        position: relative;
+        cursor: pointer;
+
+        &::after,
+        &::before {
+          content: '';
+          position: absolute;
+          width: 10px;
+          height: 15px;
+          background: #42b983;
+          transform-origin: center;
+          border-top-right-radius: 1000px;
+          border-top-left-radius: 1000px;
+          transform: translateY(-50%);
+        }
+
+        &::after {
+          transform: translateY(-50%) rotate(45deg);
+        }
+        &::before {
+          transform: translateY(-50%) translateX(-50%) rotate(-45deg);
+        }
+      }
     }
   }
 }

@@ -1,10 +1,10 @@
 <template>
   <div id="app">
     <div class="nav">
-      <h1 class="logo">Reddit</h1>
+      <router-link class="logo" to="/">Reddit</router-link>
+
       <div class="links">
-        <router-link to="/">Home</router-link>
-        <router-link to="/about">About</router-link>
+        <router-link to="/favorites">Favorites</router-link>
       </div>
     </div>
     <router-view />
@@ -40,15 +40,10 @@ body {
   align-items: center;
 }
 
-.logo {
-  color: #42b983;
-  flex: 5;
-}
-
 .links {
-  display: flex;
-  justify-content: space-between;
-  flex: 1;
+  // display: flex;
+  // justify-content: space-between;
+  // flex: 1;
 
   a {
     font-weight: bold;
@@ -60,6 +55,14 @@ body {
       color: #42b983;
     }
   }
+}
+
+.logo {
+  color: #42b983;
+  flex: 5;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 2rem;
 }
 
 @media screen and (max-width: 950px) {
