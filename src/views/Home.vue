@@ -1,8 +1,38 @@
 <template>
   <div class="home">
     <form @submit.prevent="setSearchTerm" class="form">
-      <input v-model="input" type="text" name="search-input" />
-      <button type="submit">Search</button>
+      <div class="user-input">
+        <input
+          v-model="input"
+          @input="autoComplete"
+          autocomplete="off"
+          type="text"
+          name="search-input"
+        />
+        <button type="submit">Search</button>
+      </div>
+      <div v-if="autocompleteSuggestions.length" class="suggestions">
+        <div
+          v-for="suggestion in autocompleteSuggestions.filter(
+            (item) =>
+              item.data.display_name_prefixed ||
+              item.data.subreddit.display_name
+          )"
+          :key="
+            suggestion.data.created + Math.random() * suggestion.data.created
+          "
+          @click="setInput(suggestion)"
+          class="item"
+        >
+          {{
+            suggestion.data.display_name_prefixed
+              ? suggestion.data.display_name_prefixed.replace(/(u\/)|(r\/)/, '')
+              : suggestion.data.subreddit.display_name
+              ? suggestion.data.subreddit.display_name.replace(/(u_)/, '')
+              : ''
+          }}
+        </div>
+      </div>
     </form>
 
     <div class="results">
@@ -14,7 +44,7 @@
       />
       <h3 v-if="error">{{ searchTerm }} NOT FOUND</h3>
       <div
-        :key="item.data.title + item.data.created"
+        :key="item.data.title + item.data.created + Date.now()"
         v-for="item in output"
         class="card"
       >
@@ -59,18 +89,33 @@ export default {
       searchTerm: '',
       after: undefined,
       output: [],
+      autocompleteSuggestions: [],
       loading: false,
       error: false,
       fadeIn: false,
       callingAPI: false,
+      previousCall: undefined,
       timeago,
 
       setSearchTerm() {
+        this.autocompleteSuggestions = [];
         this.searchTerm = this.input
           .trim()
           .split(' ')
           .join('');
         this.input = '';
+      },
+
+      setInput(item) {
+        if (item.data.display_name_prefixed) {
+          this.input = item.data.display_name_prefixed.replace(
+            /(u\/)|(r\/)/,
+            ''
+          );
+        } else if (item.data.subreddit.display_name) {
+          this.input = item.data.subreddit.display_name.replace(/(u_)/, '');
+        }
+        this.setSearchTerm();
       },
     };
   },
@@ -81,6 +126,21 @@ export default {
         left: 0,
         behavior: 'smooth',
       });
+    },
+    autoComplete() {
+      if (this.previousCall === undefined) {
+        this.getSuggestions(this.input);
+        this.previousCall = Date.now();
+      } else {
+        const timeNow = Date.now();
+        const waitTime = timeNow - this.previousCall;
+
+        if (waitTime > 500) {
+          this.getSuggestions(this.input);
+
+          this.previousCall = timeNow;
+        }
+      }
     },
     listenForScrolling() {
       window.addEventListener('scroll', () => {
@@ -95,6 +155,24 @@ export default {
           this.getData(this.searchTerm, this.after);
         }
       });
+    },
+    async getSuggestions(term) {
+      if (term === '') {
+        this.autocompleteSuggestions = [];
+      } else {
+        try {
+          const response = await fetch(
+            `https://www.reddit.com/api/subreddit_autocomplete_v2.json?query=${term
+              .trim()
+              .replace(' ', '')}&limit=10&raw_json=1&gilding_detail=1`
+          );
+          const data = await response.json();
+
+          this.autocompleteSuggestions = data.data.children;
+        } catch (error) {
+          this.autocompleteSuggestions = [];
+        }
+      }
     },
     async getData(searchTerm, after) {
       const resultData = [];
@@ -164,10 +242,19 @@ export default {
   margin: 0 auto 40px auto;
   height: 35px;
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
+
+  .user-input {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
 
   input {
     width: 80%;
+    height: 100%;
     padding: 8px;
     font-size: 18px;
     border: none;
@@ -177,11 +264,39 @@ export default {
 
   button {
     width: 20%;
+    height: 100%;
     border: none;
     outline: none;
     background: #42b983;
     color: white;
     cursor: pointer;
+  }
+
+  .suggestions {
+    width: 100%;
+    margin-top: 5px;
+    z-index: 1000;
+    background: white;
+    color: gray;
+    box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.2);
+
+    .item {
+      padding: 12px 24px;
+      font-weight: bold;
+      font-size: 0.7rem;
+      border-bottom: 1px solid rgb(240, 239, 239);
+      user-select: none;
+      cursor: pointer;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.2);
+        color: white;
+      }
+    }
   }
 }
 

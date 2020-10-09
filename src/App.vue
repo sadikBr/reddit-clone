@@ -19,7 +19,7 @@
 }
 
 body {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: sans-serif;
   width: 100vw;
   height: 100vh;
   color: #2c3e50;
