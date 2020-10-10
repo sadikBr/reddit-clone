@@ -135,7 +135,7 @@ export default {
         const timeNow = Date.now();
         const waitTime = timeNow - this.previousCall;
 
-        if (waitTime > 500) {
+        if (waitTime > 100) {
           this.getSuggestions(this.input);
 
           this.previousCall = timeNow;
