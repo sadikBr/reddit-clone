@@ -48,7 +48,13 @@
         v-for="item in output"
         class="card"
       >
+        <div
+          class="frame"
+          v-if="item.data.secure_media_embed.content"
+          v-html="decodeHTML(item.data.secure_media_embed.content)"
+        ></div>
         <router-link
+          v-else
           :to="{
             name: 'Item',
             params: { name: item.data.title, url: item.data.url },
@@ -120,6 +126,12 @@ export default {
     };
   },
   methods: {
+    decodeHTML(string) {
+      const textArea = document.createElement('textarea');
+      textArea.innerHTML = string;
+
+      return textArea.value.replace('style="position:absolute;"', '');
+    },
     scrollUp() {
       window.scrollTo({
         top: 0,
@@ -184,12 +196,13 @@ export default {
         );
 
         const data = await response.json();
-
         this.after = data.data.after;
 
         resultData.push(
-          ...data.data.children.filter((item) =>
-            item.data.url.match(/(.jpe?g|.png|.gif)$/)
+          ...data.data.children.filter(
+            (item) =>
+              item.data.url.match(/(.jpe?g|.png|.gif)$/) ||
+              item.data.secure_media_embed.content
           )
         );
       } catch (error) {
@@ -326,8 +339,6 @@ export default {
     img {
       width: 100%;
       height: auto;
-      display: inline-block;
-      box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
     }
 
     .title {
